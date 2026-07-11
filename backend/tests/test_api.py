@@ -8,6 +8,24 @@ from backend.clients.wikidata import WikidataItem, WikidataCoordinates
 client = TestClient(app)
 
 
+def make_mock_wikidata_client(return_value=None):
+    mock = AsyncMock()
+    mock.__aenter__ = AsyncMock(return_value=mock)
+    mock.__aexit__ = AsyncMock(return_value=None)
+    if return_value is not None:
+        mock.get_item = AsyncMock(return_value=return_value)
+    return mock
+
+
+def make_mock_overpass_client(return_value=None):
+    mock = AsyncMock()
+    mock.__aenter__ = AsyncMock(return_value=mock)
+    mock.__aexit__ = AsyncMock(return_value=None)
+    if return_value is not None:
+        mock.query = AsyncMock(return_value=return_value)
+    return mock
+
+
 class TestHealthEndpoint:
     def test_health(self):
         response = client.get("/health")
@@ -36,7 +54,7 @@ class TestListObjectTypes:
 class TestGetCandidates:
     @patch("backend.routers.matcher.WikidataClient")
     def test_get_candidates_success(self, mock_client_class):
-        mock_client = AsyncMock()
+        mock_client = make_mock_wikidata_client()
         mock_client.sparql_query = AsyncMock(return_value=[])
         mock_client.parse_sparql_result = MagicMock(return_value=[])
 
@@ -54,14 +72,13 @@ class TestGetMatches:
     @patch("backend.routers.matcher.OverpassClient")
     @patch("backend.routers.matcher.WikidataClient")
     def test_get_matches_success(self, mock_wd_class, mock_op_class):
-        mock_wd = AsyncMock()
-        mock_wd.get_item = AsyncMock(return_value=WikidataItem(
+        mock_wd = make_mock_wikidata_client(WikidataItem(
             qid="Q123",
             label="Test",
             country="Q34",
             country_label="Sweden",
         ))
-        mock_op = AsyncMock()
+        mock_op = make_mock_overpass_client()
         mock_op.query = AsyncMock(return_value={"elements": []})
         mock_op.parse_results = MagicMock(return_value=[])
 
@@ -82,7 +99,7 @@ class TestGetMatches:
 class TestConfirmMatch:
     @patch("backend.routers.matcher.WikidataClient")
     def test_confirm_success(self, mock_client_class):
-        mock_client = AsyncMock()
+        mock_client = make_mock_wikidata_client()
         mock_client.update_property = AsyncMock(return_value=True)
 
         with patch("backend.routers.matcher.WikidataClient", return_value=mock_client):
@@ -95,7 +112,7 @@ class TestConfirmMatch:
 
     @patch("backend.routers.matcher.WikidataClient")
     def test_confirm_wikidata_failure(self, mock_client_class):
-        mock_client = AsyncMock()
+        mock_client = make_mock_wikidata_client()
         mock_client.update_property = AsyncMock(return_value=False)
 
         with patch("backend.routers.matcher.WikidataClient", return_value=mock_client):
@@ -109,7 +126,7 @@ class TestConfirmMatch:
 class TestRejectMatch:
     @patch("backend.routers.matcher.WikidataClient")
     def test_reject_success(self, mock_client_class):
-        mock_client = AsyncMock()
+        mock_client = make_mock_wikidata_client()
         mock_client.add_not_found_marker = AsyncMock(return_value=True)
 
         with patch("backend.routers.matcher.WikidataClient", return_value=mock_client):
@@ -122,7 +139,7 @@ class TestRejectMatch:
 
     @patch("backend.routers.matcher.WikidataClient")
     def test_reject_wikidata_failure(self, mock_client_class):
-        mock_client = AsyncMock()
+        mock_client = make_mock_wikidata_client()
         mock_client.add_not_found_marker = AsyncMock(return_value=False)
 
         with patch("backend.routers.matcher.WikidataClient", return_value=mock_client):
