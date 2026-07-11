@@ -9,9 +9,12 @@ from wikibaseintegrator import wbi_helpers, wbi_config
 
 log = logging.getLogger(__name__)
 
-wbi_config.config["USER_AGENT"] = "osm-wikidata-matcher-neo 1.0"
+USER_AGENT = "osm-wikidata-matcher-neo 1.0 (https://github.com/anomalyco/opencode)"
+wbi_config.config["USER_AGENT"] = USER_AGENT
 
 WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php"
+
+HEADERS = {"User-Agent": USER_AGENT}
 
 
 class WikidataCoordinates(BaseModel):
@@ -75,7 +78,7 @@ class WikidataClient:
             "format": "json",
         }
         async with httpx.AsyncClient() as client:
-            response = await client.post(WIKIDATA_API_URL, data=data)
+            response = await client.post(WIKIDATA_API_URL, data=data, headers=HEADERS)
             return response.status_code == 200
 
     async def add_not_found_marker(
@@ -97,11 +100,12 @@ class WikidataClient:
             "format": "json",
         }
         async with httpx.AsyncClient() as client:
-            response = await client.post(WIKIDATA_API_URL, data=data)
+            response = await client.post(WIKIDATA_API_URL, data=data, headers=HEADERS)
             return response.status_code == 200
 
     async def _get_edit_token(self) -> str:
-        headers = {"Authorization": f"Bearer {self._access_token}"} if self._access_token else {}
+        auth_headers = {"Authorization": f"Bearer {self._access_token}"} if self._access_token else {}
+        headers = {**HEADERS, **auth_headers}
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 WIKIDATA_API_URL,
