@@ -210,6 +210,9 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
         <button @click="openWikidata" class="btn btn-outline-secondary">
           Wikidata ↗
         </button>
+        <a v-if="data?.badkartan" :href="`https://www.badkartan.se/${data.badkartan}`" target="_blank" class="btn btn-info">
+          Badkartan ↗
+        </a>
       </div>
       <small class="text-muted">
         {{ authStatus.logged_in ? authStatus.username : t('auth.notLoggedIn') }}

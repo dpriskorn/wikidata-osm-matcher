@@ -28,6 +28,7 @@ class WikidataItem(BaseModel):
     division: str | None = None
     division_label: str | None = None
     coord: WikidataCoordinates | None = None
+    badkartan: str | None = None
 
 
 class WikidataClient:
@@ -60,10 +61,11 @@ class WikidataClient:
 
     def get_item(self, qid: str) -> WikidataItem:
         query = f"""
-        SELECT ?itemLabel ?country ?countryLabel ?coord ?alias WHERE {{
+        SELECT ?itemLabel ?country ?countryLabel ?coord ?alias ?badkartan WHERE {{
           BIND(wd:{qid} AS ?item)
           OPTIONAL {{ ?item wdt:P17 ?country }}
           OPTIONAL {{ ?item wdt:P625 ?coord }}
+          OPTIONAL {{ ?item wdt:P9615 ?badkartan }}
           OPTIONAL {{ ?item skos:altLabel ?alias FILTER(LANG(?alias) = "sv") }}
           SERVICE wikibase:label {{ bd:serviceParam wikibase:language "sv,en". }}
         }}
@@ -89,6 +91,7 @@ class WikidataClient:
             country=self._extract_qid(r.get("country", {}).get("value")),
             country_label=r.get("countryLabel", {}).get("value"),
             coord=coord,
+            badkartan=r.get("badkartan", {}).get("value"),
         )
 
     def update_property(self, qid: str, property_id: str, value: str) -> bool:
@@ -152,6 +155,7 @@ class WikidataClient:
                 division=self._extract_qid(r.get("division", {}).get("value")),
                 division_label=r.get("divisionLabel", {}).get("value"),
                 coord=coord,
+                badkartan=r.get("badkartan", {}).get("value"),
             ))
         log.info(f"Parsed {len(items)} Wikidata items from {len(results)} bindings")
         return items
