@@ -11,9 +11,9 @@ log = logging.getLogger(__name__)
 USER_AGENT = "osm-wikidata-matcher-neo 1.0 (https://github.com/anomalyco/opencode)"
 
 OVERPASS_MIRRORS = [
+    "https://z.overpass-api.de/api/interpreter",
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
-    "https://z.overpass-api.de/api/interpreter",
 ]
 
 HEADERS = {"User-Agent": USER_AGENT}

@@ -3,7 +3,7 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import confetti from 'canvas-confetti'
-import { getMatches, confirmMatch, type MatchResponse } from '../api'
+import { getMatches, confirmMatch, getAuthStatus, type MatchResponse, type AuthStatus } from '../api'
 import L from 'leaflet'
 
 const { t } = useI18n()
@@ -22,9 +22,11 @@ const data = ref<MatchResponse | null>(null)
 const confirmingId = ref<string | null>(null)
 const statusMsg = ref<string | null>(null)
 const mapContainer = ref<HTMLDivElement | null>(null)
+const authStatus = ref<AuthStatus>({ logged_in: false, username: null })
 let map: L.Map | null = null
 
 onMounted(async () => {
+  authStatus.value = await getAuthStatus()
   await load()
 })
 
@@ -199,6 +201,9 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
           Wikidata ↗
         </button>
       </div>
+      <small class="text-muted">
+        {{ authStatus.logged_in ? authStatus.username : t('auth.notLoggedIn') }}
+      </small>
     </div>
     <div class="card-body">
       <p v-if="loading" class="text-muted">{{ t('matchReview.loading') }}</p>
