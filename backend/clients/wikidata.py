@@ -23,8 +23,9 @@ class WikidataItem(BaseModel):
 
 
 class WikidataClient:
-    def __init__(self) -> None:
+    def __init__(self, access_token: str = "") -> None:
         self._client = httpx.AsyncClient(timeout=30.0)
+        self._access_token = access_token
 
     async def __aenter__(self) -> Self:
         return self
@@ -102,10 +103,12 @@ class WikidataClient:
             return response.status_code == 200
 
     async def _get_edit_token(self) -> str:
+        headers = {"Authorization": f"Bearer {self._access_token}"} if self._access_token else {}
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 WIKIDATA_API_URL,
                 params={"action": "query", "meta": "token", "format": "json"},
+                headers=headers,
             )
             data = response.json()
             return data.get("query", {}).get("tokens", {}).get("csrfToken", "")

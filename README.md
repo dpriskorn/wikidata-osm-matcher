@@ -1,12 +1,12 @@
 # Wikidata-OSM Matcher
 
-Webbapplikation för att matcha Wikidata-objekt mot OpenStreetMap med manuell validering.
+Web application for matching Wikidata objects to OpenStreetMap with manual validation.
 
-## Översikt
+## Overview
 
-Systemet hämtar objekt från Wikidata som saknar OSM-länk (P402), presenterar kandidater från Overpass API för matchning, och låter användaren bekräfta eller avvisa varje matchning.
+The system fetches objects from Wikidata that are missing an OSM link (P402), presents candidates from the Overpass API for matching, and lets the user confirm or reject each match.
 
-## Arkitektur
+## Architecture
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
@@ -21,29 +21,29 @@ Systemet hämtar objekt från Wikidata som saknar OSM-länk (P402), presenterar 
                     └─────────────┘
 ```
 
-## Objekttyper
+## Object Types
 
-Matcheringsmetoderna konfigureras per objekttyp i YAML:
+Matching methods are configured per object type in YAML:
 
-| Typ | Metod | Beskrivning |
-|-----|-------|-------------|
-| `hiking_trail` | name | Namnbaserad fuzzy match inom landets bbox |
-| `bathing_place` | bbox | Geografisk sökning inom 1km radie från koordinater |
+| Type | Method | Description |
+|------|--------|-------------|
+| `hiking_trail` | name | Name-based fuzzy match within country bbox |
+| `bathing_place` | bbox | Geographic search within 1km radius from coordinates |
 
-## Konfiguration
+## Configuration
 
-YAML-filer i `configs/`:
+YAML files in `configs/`:
 
 ```yaml
 object_type: hiking_trail
-label: "Vandringsleder"
+label: "Hiking Trails"
 
 wikidata:
-  sparql_query: |     # SPARQL för att hämta objekt utan P402
+  sparql_query: |     # SPARQL to fetch objects without P402
   overpass:
-    query: |          # Overpass QL med {{bbox}} placeholder
+    query: |          # Overpass QL with {{bbox}} placeholder
   matching:
-    method: name     # "name" eller "bbox"
+    method: name      # "name" or "bbox"
     similarity_threshold: 0.3
     exclude_words: [...]
 ```
@@ -68,30 +68,31 @@ npm run dev
 
 ## API Endpoints
 
-| Method | Endpoint | Beskrivning |
+| Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/types` | Lista objekttyper |
-| GET | `/api/types/{type}/candidates` | Objekt som behöver matchas |
-| GET | `/api/types/{type}/candidates/{qid}/matches` | OSM-kandidater för ett objekt |
-| POST | `/api/types/{type}/candidates/{qid}/confirm` | Bekräfta matchning |
-| POST | `/api/types/{type}/candidates/{qid}/reject` | Markera som "ingen match" |
+| GET | `/api/types` | List object types |
+| GET | `/api/types/{type}/candidates` | Objects needing matching |
+| GET | `/api/types/{type}/candidates/{qid}/matches` | OSM candidates for an object |
+| POST | `/api/types/{type}/candidates/{qid}/confirm` | Confirm match |
+| POST | `/api/types/{type}/candidates/{qid}/reject` | Mark as "no match" |
 
 ## Wikidata OAuth
 
-Skrivåtkomst till Wikidata kräver OAuth-autentisering. Konfigurera credentials i miljövariabler:
+Write access to Wikidata requires OAuth authentication. Configure credentials in environment variables:
 
-- `WIKIDATA_CONSUMER_KEY`
-- `WIKIDATA_CONSUMER_SECRET`
+- `WIKIMEDIA_CLIENT_KEY`
+- `WIKIMEDIA_CLIENT_SECRET`
+- `WIKIMEDIA_ACCESS_TOKEN`
 
-## Lägga till ny objekttyp
+## Adding a New Object Type
 
-1. Skapa `configs/{ny_typ}.yaml` med SPARQL-query och Overpass-fråga
-2. Starta om backend
-3. Ny typ dyker upp i webbgränssnittet
+1. Create `configs/{new_type}.yaml` with SPARQL query and Overpass query
+2. Restart backend
+3. New type appears in the web interface
 
 ## Tech Stack
 
-| Lager | Teknologi |
+| Layer | Technology |
 |-------|-----------|
 | Backend | FastAPI, Pydantic, httpx |
 | Frontend | Vue 3, Vite, TypeScript, Pinia |

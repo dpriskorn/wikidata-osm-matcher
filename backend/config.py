@@ -2,7 +2,20 @@ from pathlib import Path
 from functools import lru_cache
 import yaml
 from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
+
+
+class WikidataSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=str(Path(__file__).parent.parent / ".env"),
+        extra="ignore",
+        env_prefix="WIKIMEDIA_",
+    )
+
+    client_key: str = ""
+    client_secret: str = ""
+    access_token: str = ""
 
 
 class WikidataConfig(BaseModel):
@@ -61,3 +74,8 @@ def get_config(object_type: str) -> ObjectTypeConfig:
     if object_type not in configs:
         raise ValueError(f"Unknown object type: {object_type}")
     return configs[object_type]
+
+
+@lru_cache
+def get_wikidata_settings() -> WikidataSettings:
+    return WikidataSettings()
