@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 USER_AGENT = "osm-wikidata-matcher-neo 1.0 (https://github.com/anomalyco/opencode)"
 wbi_config["USER_AGENT"] = USER_AGENT
 wbi_config["MEDIAWIKI_API_URL"] = "https://www.wikidata.org/w/api.php"
-wbi_config["SPARQL_ENDPOINT"] = "https://qlever.cs.uni-freiburg.de/api/wikidata"
+wbi_config["SPARQL_ENDPOINT_URL"] = "https://qlever.cs.uni-freiburg.de/api/wikidata"
 
 
 class WikidataCoordinates(BaseModel):
