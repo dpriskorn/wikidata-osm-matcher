@@ -36,7 +36,8 @@
     "uploadOsmIdToWikidata": "Ladda upp OSM ID till Wikidata",
     "saving": "Sparar...",
     "backToList": "← Tillbaka till lista",
-    "needsInvestigation": "Behöver undersökas"
+    "needsInvestigation": "Behöver undersökas",
+    "copyQid": "Kopiera QID"
   },
   "candidateList": {
     "loading": "Laddar...",

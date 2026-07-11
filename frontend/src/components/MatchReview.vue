@@ -109,6 +109,14 @@ function openWikidata() {
   window.open(`https://www.wikidata.org/wiki/${props.qid}`, '_blank')
 }
 
+async function copyQid() {
+  try {
+    await navigator.clipboard.writeText(props.qid)
+  } catch (e) {
+    console.error('Failed to copy QID:', e)
+  }
+}
+
 function getEditUrl(osmType: string, osmId: string, zoom: number): string {
   return `https://www.openstreetmap.org/edit?${osmType}=${osmId}&zoom=${zoom}`
 }
@@ -170,9 +178,14 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <span class="fw-bold">{{ data?.label || qid }}</span>
-      <button @click="openWikidata" class="btn btn-outline-secondary btn-sm">
-        Wikidata ↗
-      </button>
+      <div class="btn-group btn-group-sm">
+        <button @click="copyQid" class="btn btn-outline-secondary" title="Copy QID">
+          📋 {{ qid }}
+        </button>
+        <button @click="openWikidata" class="btn btn-outline-secondary">
+          Wikidata ↗
+        </button>
+      </div>
     </div>
     <div class="card-body">
       <p v-if="loading" class="text-muted">{{ t('matchReview.loading') }}</p>

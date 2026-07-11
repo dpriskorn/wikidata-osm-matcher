@@ -36,7 +36,8 @@
     "uploadOsmIdToWikidata": "Upload OSM ID to Wikidata",
     "saving": "Saving...",
     "backToList": "← Back to list",
-    "needsInvestigation": "Needs investigation"
+    "needsInvestigation": "Needs investigation",
+    "copyQid": "Copy QID"
   },
   "candidateList": {
     "loading": "Loading...",
