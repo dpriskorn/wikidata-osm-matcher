@@ -1,12 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { ref } from 'vue'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import ObjectTypeSelector from './ObjectTypeSelector.vue'
 import * as api from '../api'
 
 vi.mock('../api')
 
 const mockedApi = vi.mocked(api, true)
+
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [{ path: '/:typeQid', component: { template: '<div>Country</div>' } }]
+})
 
 describe('ObjectTypeSelector', () => {
   beforeEach(() => {
@@ -15,14 +20,18 @@ describe('ObjectTypeSelector', () => {
 
   it('shows loading state initially', async () => {
     mockedApi.getObjectTypes.mockReturnValue(new Promise(() => {}))
-    const wrapper = mount(ObjectTypeSelector)
+    const wrapper = mount(ObjectTypeSelector, {
+      global: { plugins: [router] }
+    })
 
     expect(wrapper.text()).toContain('Laddar...')
   })
 
   it('shows error on API failure', async () => {
     mockedApi.getObjectTypes.mockRejectedValue(new Error('API Error'))
-    const wrapper = mount(ObjectTypeSelector)
+    const wrapper = mount(ObjectTypeSelector, {
+      global: { plugins: [router] }
+    })
 
     await wrapper.vm.$nextTick()
     await new Promise(r => setTimeout(r, 0))
@@ -32,10 +41,12 @@ describe('ObjectTypeSelector', () => {
 
   it('renders type buttons when data loads', async () => {
     mockedApi.getObjectTypes.mockResolvedValue([
-      { object_type: 'hiking_trail', label: 'Hiking Trails' },
-      { object_type: 'bathing_place', label: 'Bathing Places' },
+      { object_type: 'hiking_trail', label: 'Hiking Trails', qid: 'Q2143825' },
+      { object_type: 'bathing_place', label: 'Bathing Places', qid: 'Q567998' },
     ])
-    const wrapper = mount(ObjectTypeSelector)
+    const wrapper = mount(ObjectTypeSelector, {
+      global: { plugins: [router] }
+    })
 
     await wrapper.vm.$nextTick()
     await new Promise(r => setTimeout(r, 0))
@@ -46,18 +57,21 @@ describe('ObjectTypeSelector', () => {
     expect(buttons[1].text()).toBe('Bathing Places')
   })
 
-  it('emits select event with object_type on button click', async () => {
+  it('navigates on button click', async () => {
     mockedApi.getObjectTypes.mockResolvedValue([
-      { object_type: 'hiking_trail', label: 'Hiking Trails' },
+      { object_type: 'hiking_trail', label: 'Hiking Trails', qid: 'Q2143825' },
     ])
-    const wrapper = mount(ObjectTypeSelector)
+    const push = vi.fn()
+    router.push = push
+    const wrapper = mount(ObjectTypeSelector, {
+      global: { plugins: [router] }
+    })
 
     await wrapper.vm.$nextTick()
     await new Promise(r => setTimeout(r, 0))
 
     await wrapper.find('button').trigger('click')
 
-    expect(wrapper.emitted('select')).toBeTruthy()
-    expect(wrapper.emitted('select')?.[0]).toEqual(['hiking_trail'])
+    expect(push).toHaveBeenCalledWith('/Q2143825')
   })
 })
