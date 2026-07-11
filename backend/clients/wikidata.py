@@ -15,8 +15,17 @@ class QleverIntegrator:
     endpoint: str = "https://qlever.cs.uni-freiburg.de/api/wikidata"
     session: requests.Session = requests.Session()
 
+    SPARQL_PREFIXES = """
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+"""
+
     def execute_query(self, query: str) -> dict:
-        params = {'query': query, 'action': 'json_export'}
+        full_query = self.SPARQL_PREFIXES + query
+        params = {'query': full_query, 'action': 'json_export'}
         response = self.session.get(self.endpoint, params=params)
         response.raise_for_status()
         return response.json()
