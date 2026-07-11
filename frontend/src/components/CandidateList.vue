@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import confetti from 'canvas-confetti'
 import { getCandidates, type CandidateInfo } from '../api'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   typeQid: string
@@ -19,11 +23,31 @@ async function load() {
   error.value = null
   try {
     candidates.value = await getCandidates(props.typeQid, props.countryQid, props.divisionQid)
+    checkAllDone()
   } catch (e) {
     error.value = 'Kunde inte ladda kandidater'
   } finally {
     loading.value = false
   }
+}
+
+function checkAllDone() {
+  if (candidates.value.length === 0 && !loading.value) {
+    celebrateAllDone()
+  }
+}
+
+function celebrateAllDone() {
+  const myCanvas = document.createElement('canvas')
+  document.body.appendChild(myCanvas)
+  const myConfetti = confetti.create(myCanvas, { resize: true })
+  myConfetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#28a745', '#17a2b8', '#ffc107', '#dc3545'],
+  })
+  setTimeout(() => document.body.removeChild(myCanvas), 2000)
 }
 
 onMounted(load)
@@ -41,7 +65,7 @@ function selectCandidate(qid: string) {
       <button @click="router.push(`/${typeQid}/${countryQid}`)" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
     </div>
     <div class="card-body p-0">
-      <p v-if="loading" class="text-muted p-3">Laddar...</p>
+      <p v-if="loading" class="text-muted p-3">{{ t('candidateList.loading') }}</p>
       <p v-if="error" class="text-danger p-3">{{ error }}</p>
       <ul v-else-if="candidates.length" class="list-group list-group-flush">
         <li
@@ -57,9 +81,13 @@ function selectCandidate(qid: string) {
           </div>
         </li>
       </ul>
-      <p v-else class="text-muted p-3">Inga kandidater hittades.</p>
+      <div v-else class="text-center py-5">
+        <p class="text-success fs-1 mb-2">🎉</p>
+        <p class="text-success fw-bold">{{ t('candidateList.allDone') }}</p>
+        <p class="text-muted">{{ t('candidateList.allDoneMessage') }}</p>
+      </div>
     </div>
-    <div class="card-footer text-muted">
+    <div v-if="candidates.length" class="card-footer text-muted">
       {{ candidates.length }} objekt
     </div>
   </div>

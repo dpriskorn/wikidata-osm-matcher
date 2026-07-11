@@ -2,6 +2,7 @@
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import confetti from 'canvas-confetti'
 import { getMatches, confirmMatch, type MatchResponse } from '../api'
 import L from 'leaflet'
 
@@ -81,12 +82,27 @@ async function handleConfirm(osmId: string, osmType: string, osmName: string) {
   try {
     await confirmMatch(props.typeQid, props.countryQid, props.divisionQid, props.qid, osmId, osmType, osmName)
     statusMsg.value = t('matchReview.saved')
+    celebrateSave()
     setTimeout(() => router.push(`/${props.typeQid}/${props.countryQid}/${props.divisionQid}`), 1500)
   } catch (e) {
     error.value = t('matchReview.couldNotSaveMatch')
   } finally {
     confirmingId.value = null
   }
+}
+
+function celebrateSave() {
+  const myCanvas = document.createElement('canvas')
+  document.body.appendChild(myCanvas)
+  const myConfetti = confetti.create(myCanvas, { resize: true })
+  myConfetti({
+    particleCount: 50,
+    spread: 40,
+    origin: { y: 0.5 },
+    colors: ['#28a745'],
+    startVelocity: 30,
+  })
+  setTimeout(() => document.body.removeChild(myCanvas), 1500)
 }
 
 function openWikidata() {

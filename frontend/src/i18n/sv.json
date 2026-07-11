@@ -40,7 +40,9 @@
   },
   "candidateList": {
     "loading": "Laddar...",
-    "error": "Fel vid laddning av kandidater"
+    "error": "Error loading candidates",
+    "allDone": "Klart!",
+    "allDoneMessage": "Alla kandidater är matchade."
   },
   "objectType": {
     "bathingPlace": "Badplatser",

@@ -40,7 +40,9 @@
   },
   "candidateList": {
     "loading": "Loading...",
-    "error": "Error loading candidates"
+    "error": "Error loading candidates",
+    "allDone": "All done!",
+    "allDoneMessage": "All candidates are matched."
   },
   "objectType": {
     "bathingPlace": "Bathing places",
