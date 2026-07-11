@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import confetti from 'canvas-confetti'
-import { getCandidates, type CandidateInfo } from '../api'
+import { getCandidates, getWikidataLabel, type CandidateInfo } from '../api'
 
 const { t } = useI18n()
 
@@ -16,21 +16,35 @@ const props = defineProps<{
 const router = useRouter()
 const candidates = ref<CandidateInfo[]>([])
 const loading = ref(true)
+const labelsLoading = ref(true)
 const error = ref<string | null>(null)
 const hasLoaded = ref(false)
+const labels = ref<Record<string, string>>({})
 
 async function load() {
   loading.value = true
+  labelsLoading.value = true
   error.value = null
   try {
     candidates.value = await getCandidates(props.typeQid, props.countryQid, props.divisionQid)
+    await fetchLabels()
     hasLoaded.value = true
     checkAllDone()
   } catch (e) {
     error.value = 'Kunde inte ladda kandidater'
   } finally {
     loading.value = false
+    labelsLoading.value = false
   }
+}
+
+async function fetchLabels() {
+  const results = await Promise.all(
+    candidates.value.map(c => getWikidataLabel(c.qid, 'sv'))
+  )
+  results.forEach((label, i) => {
+    labels.value[candidates.value[i].qid] = label
+  })
 }
 
 function checkAllDone() {
@@ -67,7 +81,9 @@ function selectCandidate(qid: string) {
       <button @click="router.push(`/${typeQid}/${countryQid}`)" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
     </div>
     <div class="card-body p-0">
-      <p v-if="loading" class="text-muted p-3">{{ t('candidateList.loading') }}</p>
+      <p v-if="loading || labelsLoading" class="text-muted p-3">
+        {{ labelsLoading ? 'Laddar etiketter...' : t('candidateList.loading') }}
+      </p>
       <p v-if="error" class="text-danger p-3">{{ error }}</p>
       <ul v-else-if="candidates.length" class="list-group list-group-flush">
         <li
@@ -78,7 +94,7 @@ function selectCandidate(qid: string) {
           style="cursor: pointer"
         >
           <div>
-            <span class="fw-bold">{{ c.label }}</span>
+            <span class="fw-bold">{{ labels[c.qid] }}</span>
             <span class="text-muted ms-2">{{ c.qid }}</span>
           </div>
         </li>
