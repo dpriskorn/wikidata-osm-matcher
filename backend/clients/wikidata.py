@@ -4,11 +4,13 @@ import re
 from typing import Any, Self
 from datetime import datetime, timezone
 from pydantic import BaseModel
+from wikibaseintegrator import wbi_helpers, wbi_config
 
 
 log = logging.getLogger(__name__)
 
-WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
+wbi_config.config["USER_AGENT"] = "osm-wikidata-matcher-neo 1.0"
+
 WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php"
 
 
@@ -37,18 +39,8 @@ class WikidataClient:
         await self._client.aclose()
 
     async def sparql_query(self, query: str) -> list[dict[str, Any]]:
-        log.debug("Executing SPARQL query")
-        headers = {
-            "Accept": "application/sparql-results+json",
-            "User-Agent": "wikidata-osm-matcher/0.1.0",
-        }
-        response = await self._client.get(
-            WIKIDATA_SPARQL_URL,
-            params={"query": query, "format": "json"},
-            headers=headers,
-        )
-        response.raise_for_status()
-        data = response.json()
+        log.debug("Executing SPARQL query via wikibaseintegrator")
+        data = wbi_helpers.execute_sparql_query(query)
         results = data.get("results", {}).get("bindings", [])
         log.debug(f"SPARQL returned {len(results)} raw results")
         return results

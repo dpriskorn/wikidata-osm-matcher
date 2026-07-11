@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getObjectTypes, type ObjectTypeInfo } from '../api'
 
-const emit = defineEmits<{
-  select: [type: string]
-}>()
-
+const router = useRouter()
 const types = ref<ObjectTypeInfo[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -19,62 +17,30 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+function selectType(type: ObjectTypeInfo) {
+  router.push(`/${type.qid}`)
+}
 </script>
 
 <template>
-  <div class="selector">
-    <h2>Välj objekttyp</h2>
-    <p v-if="loading">Laddar...</p>
-    <p v-if="error" class="error">{{ error }}</p>
-    <div v-else class="type-grid">
-      <button
-        v-for="t in types"
-        :key="t.object_type"
-        @click="emit('select', t.object_type)"
-        class="type-btn"
-      >
-        {{ t.label }}
-      </button>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Välj objekttyp</h2>
+    </div>
+    <div class="card-body">
+      <p v-if="loading" class="text-muted">Laddar...</p>
+      <p v-if="error" class="text-danger">{{ error }}</p>
+      <div v-else class="row g-3">
+        <div v-for="t in types" :key="t.qid" class="col-md-4 col-lg-3">
+          <button
+            @click="selectType(t)"
+            class="btn btn-outline-primary w-100 text-start"
+          >
+            {{ t.label }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.selector {
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-h2 {
-  margin-bottom: 16px;
-  font-size: 1.1rem;
-}
-
-.type-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px;
-}
-
-.type-btn {
-  padding: 16px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fafafa;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-.type-btn:hover {
-  background: #0066cc;
-  color: white;
-  border-color: #0066cc;
-}
-
-.error {
-  color: #cc0000;
-}
-</style>

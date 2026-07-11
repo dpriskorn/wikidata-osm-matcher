@@ -10,9 +10,12 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "vue": "^3.4.0",
+    "@popperjs/core": "^2.11.8",
+    "axios": "^1.6.0",
+    "bootstrap": "^5.3.8",
     "pinia": "^2.1.0",
-    "axios": "^1.6.0"
+    "vue": "^3.4.0",
+    "vue-router": "^5.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",

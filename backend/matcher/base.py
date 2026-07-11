@@ -13,7 +13,6 @@ class MatchCandidate(BaseModel, Generic[T]):
     osm_id: str
     osm_type: str
     osm_name: str
-    osm_url: str
 
     @property
     def osm_url(self) -> str:

@@ -1,5 +1,6 @@
 object_type: hiking_trail
 label: "Vandringsleder"
+qid: Q2143825  # Hiking trail (path for hiking)
 
 wikidata:
   sparql_query: |
