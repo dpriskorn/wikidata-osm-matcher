@@ -24,10 +24,18 @@ class CandidateInfo(BaseModel):
     label: str
     country: str | None = None
     country_label: str | None = None
+    division: str | None = None
+    division_label: str | None = None
     coord: WikidataCoordinates | None = None
 
 
 class CountryInfo(BaseModel):
+    qid: str
+    label: str
+    count: int
+
+
+class DivisionInfo(BaseModel):
     qid: str
     label: str
     count: int
@@ -100,30 +108,58 @@ async def get_countries(type_qid: str):
         ]
 
 
-@router.get("/types/{type_qid}/countries/{country_qid}/candidates", response_model=list[CandidateInfo])
-async def get_candidates(type_qid: str, country_qid: str):
-    log.info(f"Getting candidates for type_qid={type_qid}, country={country_qid}")
+@router.get("/types/{type_qid}/countries/{country_qid}/divisions", response_model=list[DivisionInfo])
+async def get_divisions(type_qid: str, country_qid: str):
+    log.info(f"Getting divisions for type_qid={type_qid}, country={country_qid}")
     object_type, config = get_config_by_qid(type_qid)
     settings = get_wikidata_settings()
     async with WikidataClient(access_token=settings.access_token) as wikidata:
         results = await wikidata.sparql_query(config.wikidata.sparql_query)
         items = wikidata.parse_sparql_result(results, config.wikidata.label_property)
         filtered = [item for item in items if item.country == country_qid]
-        log.info(f"Returning {len(filtered)} candidates for {object_type} in {country_qid}")
+
+        division_counts: dict[str, tuple[str, int]] = {}
+        for item in filtered:
+            div = item.division or "unknown"
+            if div not in division_counts:
+                division_counts[div] = (item.division_label or div, 0)
+            division_counts[div] = (division_counts[div][0], division_counts[div][1] + 1)
+
+        return [
+            DivisionInfo(qid=qid, label=label, count=count)
+            for qid, (label, count) in sorted(division_counts.items(), key=lambda x: -x[1][1])
+        ]
+
+
+@router.get("/types/{type_qid}/countries/{country_qid}/divisions/{division_qid}/candidates", response_model=list[CandidateInfo])
+async def get_candidates_by_division(type_qid: str, country_qid: str, division_qid: str):
+    log.info(f"Getting candidates for type_qid={type_qid}, country={country_qid}, division={division_qid}")
+    object_type, config = get_config_by_qid(type_qid)
+    settings = get_wikidata_settings()
+    async with WikidataClient(access_token=settings.access_token) as wikidata:
+        results = await wikidata.sparql_query(config.wikidata.sparql_query)
+        items = wikidata.parse_sparql_result(results, config.wikidata.label_property)
+        filtered = [
+            item for item in items
+            if item.country == country_qid and (item.division == division_qid or (division_qid == "unknown" and not item.division))
+        ]
+        log.info(f"Returning {len(filtered)} candidates for {object_type} in {country_qid}/{division_qid}")
         return [
             CandidateInfo(
                 qid=item.qid,
                 label=item.label,
                 country_label=item.country_label,
+                division=item.division,
+                division_label=item.division_label,
                 coord=item.coord,
             )
             for item in filtered
         ]
 
 
-@router.get("/types/{type_qid}/countries/{country_qid}/candidates/{qid}/matches", response_model=MatchResponse)
-async def get_matches(type_qid: str, country_qid: str, qid: str):
-    log.info(f"Finding matches for type_qid={type_qid}, country={country_qid}, qid={qid}")
+@router.get("/types/{type_qid}/countries/{country_qid}/divisions/{division_qid}/candidates/{qid}/matches", response_model=MatchResponse)
+async def get_matches(type_qid: str, country_qid: str, division_qid: str, qid: str):
+    log.info(f"Finding matches for type_qid={type_qid}, country={country_qid}, division={division_qid}, qid={qid}")
     object_type, config = get_config_by_qid(type_qid)
     settings = get_wikidata_settings()
     osm_settings = get_osm_settings()
@@ -150,8 +186,8 @@ async def get_matches(type_qid: str, country_qid: str, qid: str):
         )
 
 
-@router.post("/types/{type_qid}/countries/{country_qid}/candidates/{qid}/confirm")
-async def confirm_match(type_qid: str, country_qid: str, qid: str, request: ConfirmRequest):
+@router.post("/types/{type_qid}/countries/{country_qid}/divisions/{division_qid}/candidates/{qid}/confirm")
+async def confirm_match(type_qid: str, country_qid: str, division_qid: str, qid: str, request: ConfirmRequest):
     object_type, config = get_config_by_qid(type_qid)
     settings = get_wikidata_settings()
     async with WikidataClient(access_token=settings.access_token) as wikidata:
@@ -165,8 +201,8 @@ async def confirm_match(type_qid: str, country_qid: str, qid: str, request: Conf
     return {"status": "ok"}
 
 
-@router.post("/types/{type_qid}/countries/{country_qid}/candidates/{qid}/reject")
-async def reject_match(type_qid: str, country_qid: str, qid: str, request: RejectRequest):
+@router.post("/types/{type_qid}/countries/{country_qid}/divisions/{division_qid}/candidates/{qid}/reject")
+async def reject_match(type_qid: str, country_qid: str, division_qid: str, qid: str, request: RejectRequest):
     object_type, config = get_config_by_qid(type_qid)
     settings = get_wikidata_settings()
     async with WikidataClient(access_token=settings.access_token) as wikidata:

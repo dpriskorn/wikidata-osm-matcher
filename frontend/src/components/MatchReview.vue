@@ -6,6 +6,7 @@ import { getMatches, confirmMatch, rejectMatch, type MatchResponse } from '../ap
 const props = defineProps<{
   typeQid: string
   countryQid: string
+  divisionQid: string
   qid: string
 }>()
 
@@ -26,7 +27,7 @@ async function load() {
   error.value = null
   statusMsg.value = null
   try {
-    data.value = await getMatches(props.typeQid, props.countryQid, props.qid)
+    data.value = await getMatches(props.typeQid, props.countryQid, props.divisionQid, props.qid)
   } catch (e) {
     error.value = 'Kunde inte ladda matcher'
   } finally {
@@ -38,9 +39,9 @@ async function handleConfirm(osmId: string, osmType: string, osmName: string) {
   confirming.value = true
   statusMsg.value = null
   try {
-    await confirmMatch(props.typeQid, props.countryQid, props.qid, osmId, osmType, osmName)
+    await confirmMatch(props.typeQid, props.countryQid, props.divisionQid, props.qid, osmId, osmType, osmName)
     statusMsg.value = 'Matchning sparad!'
-    setTimeout(() => router.push(`/${props.typeQid}/${props.countryQid}`), 1500)
+    setTimeout(() => router.push(`/${props.typeQid}/${props.countryQid}/${props.divisionQid}`), 1500)
   } catch (e) {
     error.value = 'Kunde inte spara matchning'
   } finally {
@@ -52,9 +53,9 @@ async function handleReject() {
   rejecting.value = true
   statusMsg.value = null
   try {
-    await rejectMatch(props.typeQid, props.countryQid, props.qid)
+    await rejectMatch(props.typeQid, props.countryQid, props.divisionQid, props.qid)
     statusMsg.value = 'Markerad som "ingen match"'
-    setTimeout(() => router.push(`/${props.typeQid}/${props.countryQid}`), 1500)
+    setTimeout(() => router.push(`/${props.typeQid}/${props.countryQid}/${props.divisionQid}`), 1500)
   } catch (e) {
     error.value = 'Kunde inte spara'
   } finally {
@@ -159,7 +160,7 @@ function getSimilarityClass(sim: number): string {
       </div>
     </div>
     <div class="card-footer">
-      <button @click="router.push(`/${typeQid}/${countryQid}`)" class="btn btn-sm btn-outline-secondary">
+      <button @click="router.push(`/${typeQid}/${countryQid}/${divisionQid}`)" class="btn btn-sm btn-outline-secondary">
         ← Tillbaka till lista
       </button>
     </div>

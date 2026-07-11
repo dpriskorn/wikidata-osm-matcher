@@ -6,6 +6,7 @@ import { getCandidates, type CandidateInfo } from '../api'
 const props = defineProps<{
   typeQid: string
   countryQid: string
+  divisionQid: string
 }>()
 
 const router = useRouter()
@@ -17,7 +18,7 @@ async function load() {
   loading.value = true
   error.value = null
   try {
-    candidates.value = await getCandidates(props.typeQid, props.countryQid)
+    candidates.value = await getCandidates(props.typeQid, props.countryQid, props.divisionQid)
   } catch (e) {
     error.value = 'Kunde inte ladda kandidater'
   } finally {
@@ -26,10 +27,10 @@ async function load() {
 }
 
 onMounted(load)
-watch(() => [props.typeQid, props.countryQid], load)
+watch(() => [props.typeQid, props.countryQid, props.divisionQid], load)
 
 function selectCandidate(qid: string) {
-  router.push(`/${props.typeQid}/${props.countryQid}/${qid}`)
+  router.push(`/${props.typeQid}/${props.countryQid}/${props.divisionQid}/${qid}`)
 }
 </script>
 
@@ -37,7 +38,7 @@ function selectCandidate(qid: string) {
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h2 class="h5 mb-0">Kandidater</h2>
-      <button @click="router.push(`/${typeQid}`)" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
+      <button @click="router.push(`/${typeQid}/${countryQid}`)" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
     </div>
     <div class="card-body p-0">
       <p v-if="loading" class="text-muted p-3">Laddar...</p>

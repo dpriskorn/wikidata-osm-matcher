@@ -4,10 +4,11 @@ qid: Q2143825  # Hiking trail (path for hiking)
 
 wikidata:
   sparql_query: |
-    SELECT ?item ?itemLabel ?country ?countryLabel WHERE {
+    SELECT ?item ?itemLabel ?country ?countryLabel ?division ?divisionLabel WHERE {
       ?item wdt:P31 wd:Q2143825 .
       MINUS { ?item wdt:P402 [] }
       OPTIONAL { ?item wdt:P17 ?country }
+      OPTIONAL { ?item wdt:P131 ?division }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "sv,en". }
     }
   label_property: itemLabel

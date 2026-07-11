@@ -15,10 +15,18 @@ export interface CandidateInfo {
   label: string
   country: string | null
   country_label: string | null
+  division: string | null
+  division_label: string | null
   coord: { lat: number; lon: number } | null
 }
 
 export interface CountryInfo {
+  qid: string
+  label: string
+  count: number
+}
+
+export interface DivisionInfo {
   qid: string
   label: string
   count: number
@@ -50,25 +58,31 @@ export async function getCountries(type: string): Promise<CountryInfo[]> {
   return data
 }
 
-export async function getCandidates(type: string, country: string): Promise<CandidateInfo[]> {
-  const { data } = await api.get(`/types/${type}/countries/${country}/candidates`)
+export async function getDivisions(type: string, country: string): Promise<DivisionInfo[]> {
+  const { data } = await api.get(`/types/${type}/countries/${country}/divisions`)
   return data
 }
 
-export async function getMatches(type: string, country: string, qid: string): Promise<MatchResponse> {
-  const { data } = await api.get(`/types/${type}/countries/${country}/candidates/${qid}/matches`)
+export async function getCandidates(type: string, country: string, division: string): Promise<CandidateInfo[]> {
+  const { data } = await api.get(`/types/${type}/countries/${country}/divisions/${division}/candidates`)
+  return data
+}
+
+export async function getMatches(type: string, country: string, division: string, qid: string): Promise<MatchResponse> {
+  const { data } = await api.get(`/types/${type}/countries/${country}/divisions/${division}/candidates/${qid}/matches`)
   return data
 }
 
 export async function confirmMatch(
   type: string,
   country: string,
+  division: string,
   qid: string,
   osmId: string,
   osmType: string,
   osmName: string
 ): Promise<void> {
-  await api.post(`/types/${type}/countries/${country}/candidates/${qid}/confirm`, {
+  await api.post(`/types/${type}/countries/${country}/divisions/${division}/candidates/${qid}/confirm`, {
     osm_id: osmId,
     osm_type: osmType,
     osm_name: osmName,
@@ -78,10 +92,11 @@ export async function confirmMatch(
 export async function rejectMatch(
   type: string,
   country: string,
+  division: string,
   qid: string,
   reason?: string
 ): Promise<void> {
-  await api.post(`/types/${type}/countries/${country}/candidates/${qid}/reject`, {
+  await api.post(`/types/${type}/countries/${country}/divisions/${division}/candidates/${qid}/reject`, {
     reason,
   })
 }

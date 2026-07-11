@@ -4,11 +4,12 @@ qid: Q567998  # Bathing place (Swimming facility)
 
 wikidata:
   sparql_query: |
-    SELECT ?item ?itemLabel ?coord ?country ?countryLabel WHERE {
+    SELECT ?item ?itemLabel ?coord ?country ?countryLabel ?division ?divisionLabel WHERE {
       ?item wdt:P31/wdt:P279* wd:Q567998 .
       ?item wdt:P625 ?coord .
       MINUS { ?item wdt:P402 [] }
       OPTIONAL { ?item wdt:P17 ?country }
+      OPTIONAL { ?item wdt:P131 ?division }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "sv,en". }
     }
   label_property: itemLabel

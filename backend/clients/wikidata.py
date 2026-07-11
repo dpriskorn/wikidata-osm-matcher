@@ -27,6 +27,8 @@ class WikidataItem(BaseModel):
     label: str
     country: str | None = None
     country_label: str | None = None
+    division: str | None = None
+    division_label: str | None = None
     coord: WikidataCoordinates | None = None
 
 
@@ -137,6 +139,8 @@ class WikidataClient:
                 label=r.get(label_property, {}).get("value", ""),
                 country=self._extract_qid(r.get("country", {}).get("value")),
                 country_label=r.get("countryLabel", {}).get("value"),
+                division=self._extract_qid(r.get("division", {}).get("value")),
+                division_label=r.get("divisionLabel", {}).get("value"),
                 coord=coord,
             ))
         log.info(f"Parsed {len(items)} Wikidata items from {len(results)} bindings")
