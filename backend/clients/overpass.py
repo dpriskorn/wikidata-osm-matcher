@@ -45,7 +45,7 @@ class OverpassResult(BaseModel):
 
 class OverpassClient:
     def __init__(self) -> None:
-        self._client = httpx.AsyncClient(timeout=120.0)
+        self._client = httpx.AsyncClient(timeout=10.0)
 
     async def __aenter__(self) -> Self:
         return self
