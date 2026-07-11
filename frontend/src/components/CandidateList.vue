@@ -19,7 +19,29 @@ const loading = ref(true)
 const labelsLoading = ref(true)
 const error = ref<string | null>(null)
 const hasLoaded = ref(false)
-const labels = ref<Record<string, string>>({})
+const LABEL_CACHE_KEY = 'wikidata_labels'
+
+const labels = ref<Record<string, string>>(loadLabelsFromCache())
+
+function loadLabelsFromCache(): Record<string, string> {
+  try {
+    const cached = localStorage.getItem(LABEL_CACHE_KEY)
+    return cached ? JSON.parse(cached) : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveLabelsToCache() {
+  try {
+    localStorage.setItem(LABEL_CACHE_KEY, JSON.stringify(labels.value))
+  } catch {}
+}
+
+function clearLabelCache() {
+  localStorage.removeItem(LABEL_CACHE_KEY)
+  labels.value = {}
+}
 
 async function load() {
   loading.value = true
@@ -39,12 +61,15 @@ async function load() {
 }
 
 async function fetchLabels() {
+  const uncached = candidates.value.filter(c => !labels.value[c.qid])
+  if (uncached.length === 0) return
   const results = await Promise.all(
-    candidates.value.map(c => getWikidataLabel(c.qid, 'sv'))
+    uncached.map(c => getWikidataLabel(c.qid, 'sv'))
   )
   results.forEach((label, i) => {
-    labels.value[candidates.value[i].qid] = label
+    labels.value[uncached[i].qid] = label
   })
+  saveLabelsToCache()
 }
 
 function checkAllDone() {
@@ -105,8 +130,9 @@ function selectCandidate(qid: string) {
         <p class="text-muted">{{ t('candidateList.allDoneMessage') }}</p>
       </div>
     </div>
-    <div v-if="candidates.length" class="card-footer text-muted">
-      {{ candidates.length }} objekt
+    <div v-if="candidates.length" class="card-footer text-muted d-flex justify-content-between align-items-center">
+      <span>{{ candidates.length }} objekt</span>
+      <button @click="clearLabelCache" class="btn btn-sm btn-outline-secondary">Rensa cache</button>
     </div>
   </div>
 </template>
