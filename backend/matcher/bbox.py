@@ -41,7 +41,6 @@ class BBoxMatcher(Matcher[WikidataItem]):
 
         candidates = []
         has_wikidata_match = False
-        has_leisure_bathing_place = False
 
         for osm in osm_items:
             wikidata_names = [wikidata_item.label] + wikidata_item.aliases
@@ -49,11 +48,23 @@ class BBoxMatcher(Matcher[WikidataItem]):
             wikidata_match = osm.wikidata_tag == wikidata_item.qid
             is_leisure_bathing_place = osm.osm_type == "node" and osm.tags.get("leisure") == "bathing_place"
 
+            distance_m = None
+            if wikidata_item.coord and osm.lat and osm.lon:
+                distance_m = self._haversine_distance(
+                    wikidata_item.coord.lat, wikidata_item.coord.lon,
+                    osm.lat, osm.lon
+                )
+
             if wikidata_match:
                 sim = 1.0
                 has_wikidata_match = True
-            elif is_leisure_bathing_place:
-                has_leisure_bathing_place = True
+
+            needs_investigation = True
+            if wikidata_match:
+                needs_investigation = False
+            elif is_leisure_bathing_place and distance_m is not None and distance_m < 25:
+                sim = 0.9
+                needs_investigation = False
 
             candidates.append(MatchCandidate(
                 item=wikidata_item,
@@ -65,26 +76,35 @@ class BBoxMatcher(Matcher[WikidataItem]):
                 lat=osm.lat,
                 lon=osm.lon,
                 tags=osm.tags,
-                needs_investigation=not has_wikidata_match and not is_leisure_bathing_place,
+                needs_investigation=needs_investigation,
+                distance_m=distance_m,
             ))
 
-        if not has_wikidata_match and not has_leisure_bathing_place:
+        if not has_wikidata_match:
             for c in candidates:
+                if c.wikidata_match:
+                    continue
+                if c.osm_type == "node" and c.tags.get("leisure") == "bathing_place" and c.distance_m is not None and c.distance_m < 25:
+                    continue
                 c.needs_investigation = True
-        elif not has_wikidata_match and has_leisure_bathing_place:
-            for c in candidates:
-                if c.osm_type != "node" or c.tags.get("leisure") != "bathing_place":
-                    c.needs_investigation = True
 
         candidates.sort(key=lambda c: (
             not c.wikidata_match,
-            not (c.osm_type == "node" and c.tags.get("leisure") == "bathing_place"),
-            not c.similarity,
+            c.needs_investigation,
+            c.distance_m if c.distance_m is not None else float('inf'),
         ))
-        log.info(f"BBoxMatcher: found {len(candidates)} matches for {wikidata_item.label}, wikidata_match={has_wikidata_match}, leisure_bathing_place={has_leisure_bathing_place}")
+        log.info(f"BBoxMatcher: found {len(candidates)} matches for {wikidata_item.label}, wikidata_match={has_wikidata_match}")
         for c in candidates:
-            log.debug(f"  - {c.osm_type}/{c.osm_id} '{c.osm_name}' similarity={c.similarity:.2f}, wikidata_match={c.wikidata_match}, needs_investigation={c.needs_investigation}")
+            log.debug(f"  - {c.osm_type}/{c.osm_id} '{c.osm_name}' sim={c.similarity:.2f} dist={c.distance_m}m investigation={c.needs_investigation}")
         return candidates, osm_timestamp
+
+    def _haversine_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        R = 6371000
+        phi1, phi2 = math.radians(lat1), math.radians(lat2)
+        dphi = math.radians(lat2 - lat1)
+        dlambda = math.radians(lon2 - lon1)
+        a = math.sin(dphi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda/2)**2
+        return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 
     def _coord_to_bbox(self, lat: float, lon: float) -> str:
         km_per_deg_lat = 111.32
