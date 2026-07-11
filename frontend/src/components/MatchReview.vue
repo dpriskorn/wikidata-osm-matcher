@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getMatches, confirmMatch, rejectMatch, type MatchResponse } from '../api'
+import { getMatches, confirmMatch, type MatchResponse } from '../api'
 
 const props = defineProps<{
   typeQid: string
@@ -15,7 +15,6 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const data = ref<MatchResponse | null>(null)
 const confirming = ref(false)
-const rejecting = ref(false)
 const statusMsg = ref<string | null>(null)
 
 onMounted(async () => {
@@ -46,20 +45,6 @@ async function handleConfirm(osmId: string, osmType: string, osmName: string) {
     error.value = 'Kunde inte spara matchning'
   } finally {
     confirming.value = false
-  }
-}
-
-async function handleReject() {
-  rejecting.value = true
-  statusMsg.value = null
-  try {
-    await rejectMatch(props.typeQid, props.countryQid, props.divisionQid, props.qid)
-    statusMsg.value = 'Markerad som "ingen match"'
-    setTimeout(() => router.push(`/${props.typeQid}/${props.countryQid}/${props.divisionQid}`), 1500)
-  } catch (e) {
-    error.value = 'Kunde inte spara'
-  } finally {
-    rejecting.value = false
   }
 }
 
@@ -146,13 +131,6 @@ function isDataStale(isoTimestamp: string | null): boolean {
             Skapa i OSM ↗
           </a>
         </div>
-        <button
-          @click="handleReject"
-          :disabled="rejecting"
-          class="btn btn-outline-danger"
-        >
-          {{ rejecting ? 'Sparar...' : 'Markera som "ingen match"' }}
-        </button>
       </div>
 
       <ul v-if="data && !data.error && data.matches.length" class="list-unstyled">
@@ -183,16 +161,6 @@ function isDataStale(isoTimestamp: string | null): boolean {
           </div>
         </li>
       </ul>
-
-      <div v-if="data && !data.error && data.matches.length > 1" class="mt-3 pt-3 border-top">
-        <button
-          @click="handleReject"
-          :disabled="rejecting"
-          class="btn btn-outline-secondary"
-        >
-          {{ rejecting ? 'Sparar...' : 'Ingen av dessa matchar' }}
-        </button>
-      </div>
     </div>
     <div class="card-footer">
       <button @click="router.push(`/${typeQid}/${countryQid}/${divisionQid}`)" class="btn btn-sm btn-outline-secondary">
