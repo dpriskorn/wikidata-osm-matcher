@@ -116,7 +116,7 @@ async def get_divisions(type_qid: str, country_qid: str):
 
     query = config.wikidata.sparql_query
     query = query.rstrip().rstrip('}')
-    query += f'\n  FILTER(?country = wd:{country_qid})\n'
+    query = query.replace('?item wdt:P17 ?country .', f'?item wdt:P17 wd:{country_qid} .')
     query += '}'
 
     async with WikidataClient(access_token=settings.access_token) as wikidata:
@@ -144,11 +144,8 @@ async def get_candidates_by_division(type_qid: str, country_qid: str, division_q
 
     query = config.wikidata.sparql_query
     query = query.rstrip().rstrip('}')
-    query += f'\n  FILTER(?country = wd:{country_qid})\n'
-    if division_qid == "unknown":
-        query += '  FILTER(!BOUND(?division))\n'
-    else:
-        query += f'  FILTER(?division = wd:{division_qid})\n'
+    query = query.replace('?item wdt:P17 ?country .', f'?item wdt:P17 wd:{country_qid} .')
+    query = query.replace('?item wdt:P131 ?division .', f'?item wdt:P131 wd:{division_qid} .')
     query += '}'
 
     async with WikidataClient(access_token=settings.access_token) as wikidata:
