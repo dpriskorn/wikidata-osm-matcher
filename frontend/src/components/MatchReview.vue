@@ -3,7 +3,7 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import confetti from 'canvas-confetti'
-import { getMatches, confirmMatch, getAuthStatus, type MatchResponse, type AuthStatus } from '../api'
+import { getMatches, confirmMatch, getAuthStatus, rejectMatch, type MatchResponse, type AuthStatus } from '../api'
 import L from 'leaflet'
 
 const { t } = useI18n()
@@ -90,6 +90,16 @@ async function handleConfirm(osmId: string, osmType: string, osmName: string) {
     error.value = t('matchReview.couldNotSaveMatch')
   } finally {
     confirmingId.value = null
+  }
+}
+
+async function handleReject() {
+  try {
+    await rejectMatch(props.typeQid, props.countryQid, props.divisionQid, props.qid)
+    statusMsg.value = t('matchReview.rejected')
+    setTimeout(() => router.push(`/${props.typeQid}/${props.countryQid}/${props.divisionQid}`), 1500)
+  } catch (e) {
+    error.value = t('matchReview.couldNotReject')
   }
 }
 
@@ -243,6 +253,9 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
               target="_blank" class="btn btn-warning">
             {{ t('matchReview.josmAddNode') }}
           </a>
+          <button @click="handleReject" class="btn btn-warning">
+            {{ t('matchReview.markMissing') }}
+          </button>
         </div>
       </div>
 

@@ -270,12 +270,13 @@ async def reject_match(type_qid: str, country_qid: str, division_qid: str, qid: 
             qid=qid,
             property_id=config.wikidata.not_found_property,
             qualifier_property=config.wikidata.not_found_qualifier,
+            value="Q12013",
         )
     else:
         success = wikidata.update_property(
             qid=qid,
             property_id=config.wikidata.not_found_property,
-            value="not found",
+            value="Q12013",
         )
     if not success:
         raise HTTPException(status_code=500, detail="Failed to update Wikidata")

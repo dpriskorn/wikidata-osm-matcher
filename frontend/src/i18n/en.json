@@ -38,7 +38,10 @@
     "saving": "Saving...",
     "backToList": "← Back to list",
     "needsInvestigation": "Needs investigation",
-    "copyQid": "Copy QID"
+    "copyQid": "Copy QID",
+    "markMissing": "Mark as missing in OSM",
+    "rejected": "Marked as missing",
+    "couldNotReject": "Could not mark as missing"
   },
   "candidateList": {
     "loading": "Loading...",

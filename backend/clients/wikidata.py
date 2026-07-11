@@ -109,6 +109,7 @@ class WikidataClient:
         qid: str,
         property_id: str,
         qualifier_property: str,
+        value: str = "not found",
     ) -> bool:
         from wikibaseintegrator import datatypes
 
@@ -119,9 +120,9 @@ class WikidataClient:
                 prop_nr=qualifier_property,
                 time=f"+{now}/11",
             )
-            claim = datatypes.String(
+            claim = datatypes.Item(
                 prop_nr=property_id,
-                value="not found",
+                value=value,
                 qualifiers=[qualifiers],
             )
             item.claims.add(claim)

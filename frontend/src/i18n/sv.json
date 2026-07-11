@@ -38,7 +38,10 @@
     "saving": "Sparar...",
     "backToList": "← Tillbaka till lista",
     "needsInvestigation": "Behöver undersökas",
-    "copyQid": "Kopiera QID"
+    "copyQid": "Kopiera QID",
+    "markMissing": "Lägg till saknas i OSM",
+    "rejected": "Markerad som saknas",
+    "couldNotReject": "Kunde inte markera som saknas"
   },
   "candidateList": {
     "loading": "Laddar...",
