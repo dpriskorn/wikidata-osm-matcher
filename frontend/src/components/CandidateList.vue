@@ -17,12 +17,14 @@ const router = useRouter()
 const candidates = ref<CandidateInfo[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const hasLoaded = ref(false)
 
 async function load() {
   loading.value = true
   error.value = null
   try {
     candidates.value = await getCandidates(props.typeQid, props.countryQid, props.divisionQid)
+    hasLoaded.value = true
     checkAllDone()
   } catch (e) {
     error.value = 'Kunde inte ladda kandidater'
@@ -32,7 +34,7 @@ async function load() {
 }
 
 function checkAllDone() {
-  if (candidates.value.length === 0 && !loading.value) {
+  if (hasLoaded.value && candidates.value.length === 0) {
     celebrateAllDone()
   }
 }
