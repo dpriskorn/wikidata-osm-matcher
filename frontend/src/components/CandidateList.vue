@@ -47,6 +47,7 @@ async function load() {
   loading.value = true
   labelsLoading.value = true
   error.value = null
+  candidates.value = []
   try {
     candidates.value = await getCandidates(props.typeQid, props.countryQid, props.divisionQid)
     await fetchLabels()
@@ -73,7 +74,7 @@ async function fetchLabels() {
 }
 
 function checkAllDone() {
-  if (hasLoaded.value && candidates.value.length === 0) {
+  if (hasLoaded.value && !loading.value && candidates.value.length === 0) {
     celebrateAllDone()
   }
 }
