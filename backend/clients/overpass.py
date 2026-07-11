@@ -31,7 +31,7 @@ class OverpassClient:
         await self._client.aclose()
 
     async def query(self, overpass_query: str) -> dict[str, Any]:
-        log.debug(f"Executing Overpass query")
+        log.debug(f"Overpass QL query:\n{overpass_query}")
         response = await self._client.post(
             OVERPASS_API_URL,
             data={"data": overpass_query},
