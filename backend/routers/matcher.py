@@ -113,13 +113,18 @@ async def get_divisions(type_qid: str, country_qid: str):
     log.info(f"Getting divisions for type_qid={type_qid}, country={country_qid}")
     object_type, config = get_config_by_qid(type_qid)
     settings = get_wikidata_settings()
+
+    query = config.wikidata.sparql_query
+    query = query.rstrip().rstrip('}')
+    query += f'\n  FILTER(?country = wd:{country_qid})\n'
+    query += '}'
+
     async with WikidataClient(access_token=settings.access_token) as wikidata:
-        results = await wikidata.sparql_query(config.wikidata.sparql_query)
+        results = await wikidata.sparql_query(query)
         items = wikidata.parse_sparql_result(results, config.wikidata.label_property)
-        filtered = [item for item in items if item.country == country_qid]
 
         division_counts: dict[str, tuple[str, int]] = {}
-        for item in filtered:
+        for item in items:
             div = item.division or "unknown"
             if div not in division_counts:
                 division_counts[div] = (item.division_label or div, 0)
@@ -136,14 +141,20 @@ async def get_candidates_by_division(type_qid: str, country_qid: str, division_q
     log.info(f"Getting candidates for type_qid={type_qid}, country={country_qid}, division={division_qid}")
     object_type, config = get_config_by_qid(type_qid)
     settings = get_wikidata_settings()
+
+    query = config.wikidata.sparql_query
+    query = query.rstrip().rstrip('}')
+    query += f'\n  FILTER(?country = wd:{country_qid})\n'
+    if division_qid == "unknown":
+        query += '  FILTER(!BOUND(?division))\n'
+    else:
+        query += f'  FILTER(?division = wd:{division_qid})\n'
+    query += '}'
+
     async with WikidataClient(access_token=settings.access_token) as wikidata:
-        results = await wikidata.sparql_query(config.wikidata.sparql_query)
+        results = await wikidata.sparql_query(query)
         items = wikidata.parse_sparql_result(results, config.wikidata.label_property)
-        filtered = [
-            item for item in items
-            if item.country == country_qid and (item.division == division_qid or (division_qid == "unknown" and not item.division))
-        ]
-        log.info(f"Returning {len(filtered)} candidates for {object_type} in {country_qid}/{division_qid}")
+        log.info(f"Returning {len(items)} candidates for {object_type} in {country_qid}/{division_qid}")
         return [
             CandidateInfo(
                 qid=item.qid,
@@ -153,7 +164,7 @@ async def get_candidates_by_division(type_qid: str, country_qid: str, division_q
                 division_label=item.division_label,
                 coord=item.coord,
             )
-            for item in filtered
+            for item in items
         ]
 
 
