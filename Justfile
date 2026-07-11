@@ -1,11 +1,11 @@
 api:
-    cd backend && uvicorn main:app --reload --port 8000
+    cd backend && poetry run uvicorn main:app --reload --port 8000
 
 vite:
     cd frontend && npm run dev
 
 be-lint:
-    cd backend && ruff check . && mypy .
+    cd backend && poetry run ruff check . && poetry run mypy .
 
 fe-lint:
     cd frontend && npx vue-tsc --noEmit
@@ -14,7 +14,7 @@ be-test:
     cd backend && poetry run pytest -v
 
 be-test-coverage:
-    cd backend && poetry run pytest --cov=backend --cov-report=term-missing
+    cd backend && poetry run pytest --cov=backend --cov-report=term-missing --cov-report=html
 
 fe-test:
     cd frontend && npm test -- --run
