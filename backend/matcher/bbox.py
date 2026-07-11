@@ -1,9 +1,9 @@
 import math
 from typing import Any
-from ..clients.wikidata import WikidataItem, WikidataClient
-from ..clients.overpass import OverpassClient
-from .base import Matcher, MatchCandidate
-from ..config import ObjectTypeConfig
+from clients.wikidata import WikidataItem, WikidataClient
+from clients.overpass import OverpassClient
+from matcher.base import Matcher, MatchCandidate
+from config import ObjectTypeConfig
 
 
 class BBoxMatcher(Matcher[WikidataItem]):

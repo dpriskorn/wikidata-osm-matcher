@@ -1,5 +1,5 @@
-from backend.matcher.base import Matcher, MatchCandidate
-from backend.matcher.name import NameMatcher
-from backend.matcher.bbox import BBoxMatcher
+from matcher.base import Matcher, MatchCandidate
+from matcher.name import NameMatcher
+from matcher.bbox import BBoxMatcher
 
 __all__ = ["Matcher", "MatchCandidate", "NameMatcher", "BBoxMatcher"]

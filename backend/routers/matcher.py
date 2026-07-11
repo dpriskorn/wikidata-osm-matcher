@@ -1,10 +1,10 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from ..clients.wikidata import WikidataClient, WikidataItem
-from ..clients.overpass import OverpassClient
-from ..matcher import NameMatcher, BBoxMatcher
-from ..config import get_config, get_all_configs, get_wikidata_settings
+from clients.wikidata import WikidataClient, WikidataItem
+from clients.overpass import OverpassClient
+from matcher import NameMatcher, BBoxMatcher
+from config import get_config, get_all_configs, get_wikidata_settings
 
 
 router = APIRouter(prefix="/api", tags=["matcher"])
