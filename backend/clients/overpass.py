@@ -6,7 +6,10 @@ from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 
+USER_AGENT = "osm-wikidata-matcher-neo 1.0 (https://github.com/anomalyco/opencode)"
 OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
+
+HEADERS = {"User-Agent": USER_AGENT}
 
 
 class OverpassResult(BaseModel):
@@ -32,6 +35,7 @@ class OverpassClient:
         response = await self._client.post(
             OVERPASS_API_URL,
             data={"data": overpass_query},
+            headers=HEADERS,
         )
         response.raise_for_status()
         return response.json()
