@@ -12,6 +12,9 @@ logging.basicConfig(
     force=True,
 )
 
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 log = logging.getLogger(__name__)
 
 from routers import matcher
