@@ -6,7 +6,7 @@ let checkInterval: ReturnType<typeof setInterval> | null = null
 export function useBackendHealth() {
   async function checkHealth() {
     try {
-      const res = await fetch('/api/health', {
+      const res = await fetch('/health', {
         signal: AbortSignal.timeout(3000),
       })
       isBackendDown.value = !res.ok
