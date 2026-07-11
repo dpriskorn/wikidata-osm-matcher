@@ -1,5 +1,8 @@
+import json
 import logging
 import httpx
+import hashlib
+from pathlib import Path
 from typing import Any, Self
 from pydantic import BaseModel
 
@@ -15,6 +18,14 @@ OVERPASS_MIRRORS = [
 ]
 
 HEADERS = {"User-Agent": USER_AGENT}
+
+DEBUG_DIR = Path(__file__).parent.parent / "debug"
+DEBUG_DIR.mkdir(exist_ok=True)
+
+
+def _get_debug_filename(query: str) -> str:
+    query_hash = hashlib.md5(query.encode()).hexdigest()[:12]
+    return f"overpass_{query_hash}.json"
 
 
 class OverpassError(Exception):
@@ -44,6 +55,13 @@ class OverpassClient:
 
     async def query(self, overpass_query: str) -> dict[str, Any]:
         log.debug(f"Overpass QL query:\n{overpass_query}")
+
+        debug_file = DEBUG_DIR / _get_debug_filename(overpass_query)
+        if debug_file.exists():
+            log.info(f"Loading cached response from {debug_file}")
+            with open(debug_file) as f:
+                return json.load(f)
+
         last_error = None
         for url in OVERPASS_MIRRORS:
             try:
@@ -57,7 +75,11 @@ class OverpassClient:
                     log.warning(f"Overpass mirror {url} returned 504 Gateway Timeout")
                     continue
                 response.raise_for_status()
-                return response.json()
+                result = response.json()
+                with open(debug_file, "w") as f:
+                    json.dump(result, f, indent=2)
+                log.info(f"Saved Overpass response to {debug_file}")
+                return result
             except httpx.HTTPStatusError as e:
                 last_error = e
                 log.warning(f"Overpass mirror {url} failed: {e.response.status_code}")
