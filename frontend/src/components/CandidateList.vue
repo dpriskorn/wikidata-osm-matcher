@@ -131,9 +131,12 @@ function selectCandidate(qid: string) {
         <p class="text-muted">{{ t('candidateList.allDoneMessage') }}</p>
       </div>
     </div>
-    <div v-if="candidates.length" class="card-footer text-muted d-flex justify-content-between align-items-center">
-      <span>{{ candidates.length }} objekt</span>
-      <button @click="clearLabelCache" class="btn btn-sm btn-outline-secondary">Rensa cache</button>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+      <button @click="router.push(`/${typeQid}/${countryQid}`)" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
+      <div v-if="candidates.length" class="text-muted">
+        <span>{{ candidates.length }} objekt</span>
+        <button @click="clearLabelCache" class="btn btn-sm btn-outline-secondary ms-2">Rensa cache</button>
+      </div>
     </div>
   </div>
 </template>

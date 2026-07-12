@@ -65,5 +65,8 @@ function selectCountry(country: CountryInfo) {
         </button>
       </div>
     </div>
+    <div class="card-footer">
+      <button @click="router.push('/')" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
+    </div>
   </div>
 </template>

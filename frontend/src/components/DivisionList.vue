@@ -113,5 +113,8 @@ function selectDivision(division: DivisionInfo) {
       </div>
       </template>
     </div>
+    <div class="card-footer">
+      <button @click="router.push(`/${typeQid}`)" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
+    </div>
   </div>
 </template>

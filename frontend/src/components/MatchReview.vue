@@ -241,6 +241,7 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
 <template>
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
+      <button @click="router.push(`/${typeQid}/${countryQid}/${divisionQid}`)" class="btn btn-sm btn-outline-secondary">← Tillbaka</button>
       <span class="fw-bold">{{ label || qid }}</span>
       <div class="btn-group btn-group-sm">
         <button @click="copyQid" class="btn btn-outline-secondary" title="Copy QID">
