@@ -102,8 +102,9 @@ async function load() {
   loading.value = true
   error.value = null
   statusMsg.value = null
+  const radiusKm = parseFloat(localStorage.getItem('overpass_radius') || '0.5')
   try {
-    data.value = await getMatches(props.typeQid, props.countryQid, props.divisionQid, props.qid)
+    data.value = await getMatches(props.typeQid, props.countryQid, props.divisionQid, props.qid, radiusKm)
   } catch (e) {
     error.value = t('matchReview.couldNotLoadMatches')
   } finally {

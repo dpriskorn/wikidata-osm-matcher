@@ -16,6 +16,7 @@ class BBoxMatcher(Matcher[WikidataItem]):
         config: ObjectTypeConfig,
         wikidata_client: WikidataClient,
         overpass_client: OverpassClient,
+        radius_km: float | None = None,
     ):
         super().__init__(
             exclude_words=config.matching.exclude_words,
@@ -24,7 +25,7 @@ class BBoxMatcher(Matcher[WikidataItem]):
         self.config = config
         self.wikidata = wikidata_client
         self.overpass = overpass_client
-        self.radius_km = config.overpass.bbox_radius_km
+        self.radius_km = radius_km if radius_km is not None else config.overpass.bbox_radius_km
 
     async def find_matches(self, wikidata_item: WikidataItem) -> tuple[list[MatchCandidate[WikidataItem]], str | None]:
         if not wikidata_item.coord:

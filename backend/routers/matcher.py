@@ -99,12 +99,12 @@ class RejectRequest(BaseModel):
     reason: str | None = None
 
 
-def get_matcher_type(config, wikidata: WikidataClient, overpass: OverpassClient):
+def get_matcher_type(config, wikidata: WikidataClient, overpass: OverpassClient, radius_km: float | None = None):
     method = config.matching.method.lower()
     if method == "name":
         return NameMatcher(config, wikidata, overpass)
     elif method == "bbox":
-        return BBoxMatcher(config, wikidata, overpass)
+        return BBoxMatcher(config, wikidata, overpass, radius_km=radius_km)
     else:
         raise ValueError(f"Unknown matching method: {method}")
 
@@ -199,15 +199,15 @@ async def get_candidates_by_division(type_qid: str, country_qid: str, division_q
 
 
 @router.get("/types/{type_qid}/countries/{country_qid}/divisions/{division_qid}/candidates/{qid}/matches", response_model=MatchResponse)
-async def get_matches(type_qid: str, country_qid: str, division_qid: str, qid: str):
-    log.info(f"Finding matches for type_qid={type_qid}, country={country_qid}, division={division_qid}, qid={qid}")
+async def get_matches(type_qid: str, country_qid: str, division_qid: str, qid: str, radius_km: float = 0.5):
+    log.info(f"Finding matches for type_qid={type_qid}, country={country_qid}, division={division_qid}, qid={qid}, radius_km={radius_km}")
     object_type, config = get_config_by_qid(type_qid)
     settings = get_wikidata_settings()
     osm_settings = get_osm_settings()
     with WikidataClient() as wikidata, OverpassClient(timeout=config.overpass.timeout) as overpass:
         item = wikidata.get_item(qid)
         try:
-            matcher = get_matcher_type(config, wikidata, overpass)
+            matcher = get_matcher_type(config, wikidata, overpass, radius_km=radius_km)
             matches, osm_timestamp = await matcher.find_matches(item)
             log.info(f"Returning {len(matches)} matches for {qid}")
             return MatchResponse(

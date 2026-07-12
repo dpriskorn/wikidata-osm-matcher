@@ -10,6 +10,18 @@ const { t, locale } = useI18n()
 const route = useRoute()
 const typeLabel = ref<string | null>(null)
 const authStatus = ref<AuthStatus>({ logged_in: false, username: null })
+const selectedRadius = ref(0.5)
+const RADIUS_STORAGE_KEY = 'overpass_radius'
+
+const radiusOptions = [
+  { value: 0.5, label: '500m' },
+  { value: 1.0, label: '1000m' },
+]
+
+function setRadius(radius: number) {
+  selectedRadius.value = radius
+  localStorage.setItem(RADIUS_STORAGE_KEY, String(radius))
+}
 
 async function fetchTypeLabel() {
   if (route.params.typeQid) {
@@ -55,6 +67,10 @@ onMounted(() => {
   if (saved && availableLocales.some(l => l.code === saved)) {
     locale.value = saved
   }
+  const savedRadius = localStorage.getItem(RADIUS_STORAGE_KEY)
+  if (savedRadius) {
+    selectedRadius.value = parseFloat(savedRadius)
+  }
   fetchAuthStatus()
 })
 </script>
@@ -77,6 +93,18 @@ onMounted(() => {
               <li v-for="loc in availableLocales" :key="loc.code">
                 <button class="dropdown-item" :class="{ active: locale === loc.code }" @click="changeLocale(loc.code)">
                   {{ loc.name }}
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              {{ radiusOptions.find(r => r.value === selectedRadius)?.label || '500m' }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li v-for="r in radiusOptions" :key="r.value">
+                <button class="dropdown-item" :class="{ active: selectedRadius === r.value }" @click="setRadius(r.value)">
+                  {{ r.label }}
                 </button>
               </li>
             </ul>

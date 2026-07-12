@@ -80,8 +80,9 @@ export async function getCandidates(type: string, country: string, division: str
   return data
 }
 
-export async function getMatches(type: string, country: string, division: string, qid: string): Promise<MatchResponse> {
-  const { data } = await api.get(`/types/${type}/countries/${country}/divisions/${division}/candidates/${qid}/matches`)
+export async function getMatches(type: string, country: string, division: string, qid: string, radiusKm: number = 0.5): Promise<MatchResponse> {
+  const params = radiusKm !== 0.5 ? `?radius_km=${radiusKm}` : ''
+  const { data } = await api.get(`/types/${type}/countries/${country}/divisions/${division}/candidates/${qid}/matches${params}`)
   return data
 }
 
