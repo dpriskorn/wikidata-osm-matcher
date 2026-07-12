@@ -3,7 +3,7 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import confetti from 'canvas-confetti'
-import { getMatches, confirmMatch, getAuthStatus, rejectMatch, type MatchResponse, type AuthStatus } from '../api'
+import { getMatches, confirmMatch, getAuthStatus, rejectMatch, getWikidataLabel, type MatchResponse, type AuthStatus } from '../api'
 import L from 'leaflet'
 
 const { t } = useI18n()
@@ -23,11 +23,13 @@ const confirmingId = ref<string | null>(null)
 const statusMsg = ref<string | null>(null)
 const mapContainer = ref<HTMLDivElement | null>(null)
 const authStatus = ref<AuthStatus>({ logged_in: false, username: null })
+const label = ref('')
 let map: L.Map | null = null
 let markersLayer: L.LayerGroup | null = null
 
 onMounted(async () => {
   authStatus.value = await getAuthStatus()
+  label.value = await getWikidataLabel(props.qid, 'sv')
   await load()
 })
 
@@ -74,7 +76,7 @@ function addMarkers() {
   if (data.value.coord) {
     L.marker([data.value.coord.lat, data.value.coord.lon], {
       icon: L.divIcon({ className: 'wd-marker', html: '📍', iconSize: [24, 24] })
-    }).bindPopup(`Wikidata: ${data.value?.label}`).addTo(markersLayer)
+    }).bindPopup(`Wikidata: ${label.value}`).addTo(markersLayer)
   }
 
   data.value.matches.forEach(m => {
@@ -233,7 +235,7 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
 <template>
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <span class="fw-bold">{{ data?.label || qid }}</span>
+      <span class="fw-bold">{{ label || qid }}</span>
       <div class="btn-group btn-group-sm">
         <button @click="copyQid" class="btn btn-outline-secondary" title="Copy QID">
           📋 {{ qid }}
@@ -283,7 +285,7 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
              target="_blank" class="btn btn-success">
             {{ t('matchReview.createInOSM') }}
           </a>
-          <a :href="getJosmUrl(data.coord.lat, data.coord.lon, data.label)"
+          <a :href="getJosmUrl(data.coord.lat, data.coord.lon, label)"
               target="_blank" class="btn btn-warning">
             {{ t('matchReview.josmAddNode') }}
           </a>
