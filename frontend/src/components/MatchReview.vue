@@ -159,6 +159,10 @@ function getEditUrl(osmType: string, osmId: string, zoom: number): string {
   return `https://www.openstreetmap.org/edit?${osmType}=${osmId}&zoom=${zoom}`
 }
 
+function getJosmEditUrl(osmType: string, osmId: string): string {
+  return `http://localhost:8111/load_object?objects=${osmType}${osmId}`
+}
+
 function getOsmViewUrl(lat: number, lon: number, zoom: number): string {
   return `https://www.openstreetmap.org/#map=${zoom}/${lat}/${lon}`
 }
@@ -317,6 +321,11 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
                  target="_blank" class="btn btn-outline-primary btn-sm"
                  :class="{ disabled: confirmingId !== null }">
                 {{ t('matchReview.editInOSM') }}
+              </a>
+              <a :href="getJosmEditUrl(m.osm_type, m.osm_id)"
+                 target="_blank" class="btn btn-outline-primary btn-sm"
+                 :class="{ disabled: confirmingId !== null }">
+                {{ t('matchReview.editInJOSM') }}
               </a>
               <button
                 @click="handleConfirm(m.osm_id, m.osm_type, m.osm_name)"
