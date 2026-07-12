@@ -50,7 +50,17 @@ wikidata:
 
 ## Installation
 
-### Backend
+### Quick Start
+
+```bash
+just install
+just api
+just vite
+```
+
+### Manual Installation
+
+**Backend**
 
 ```bash
 cd backend
@@ -58,13 +68,26 @@ poetry install
 poetry run uvicorn main:app --reload
 ```
 
-### Frontend
+**Frontend**
 
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
+## Just Commands
+
+| Command | Description |
+|---------|-------------|
+| `just install` | Install all dependencies (backend + frontend) |
+| `just api` | Start FastAPI backend on port 8000 |
+| `just vite` | Start Vite dev server on port 5173 |
+| `just test` | Run all tests |
+| `just be-test` | Run backend tests |
+| `just fe-test` | Run frontend tests |
+| `just be-lint` | Run backend linting (ruff, mypy) |
+| `just fe-lint` | Run frontend type checking |
 
 ## API Endpoints
 
