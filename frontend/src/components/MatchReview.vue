@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import confetti from 'canvas-confetti'
@@ -24,6 +24,11 @@ const statusMsg = ref<string | null>(null)
 const mapContainer = ref<HTMLDivElement | null>(null)
 const authStatus = ref<AuthStatus>({ logged_in: false, username: null })
 const label = ref('')
+const hasBathingPlaceNode = computed(() => {
+  return data.value?.matches.some(m =>
+    m.osm_type === 'node' && m.tags?.leisure === 'bathing_place'
+  ) ?? false
+})
 let map: L.Map | null = null
 let markersLayer: L.LayerGroup | null = null
 
@@ -274,7 +279,7 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
         </button>
       </div>
 
-      <div v-if="data && !data.error && data.matches.length === 0" class="text-center py-4">
+      <div v-if="data && !data.error && !hasBathingPlaceNode" class="text-center py-4">
         <p class="text-muted mb-3">{{ t('matchReview.noMatchesFound') }}</p>
         <div v-if="data.coord" class="d-flex justify-content-center gap-2 mb-3">
           <a :href="getOsmViewUrl(data.coord.lat, data.coord.lon, 18)"
