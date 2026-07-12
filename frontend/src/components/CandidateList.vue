@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import confetti from 'canvas-confetti'
 import { getCandidates, getWikidataLabel, type CandidateInfo } from '../api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const props = defineProps<{
   typeQid: string
@@ -65,7 +65,7 @@ async function fetchLabels() {
   const uncached = candidates.value.filter(c => !labels.value[c.qid])
   if (uncached.length === 0) return
   const results = await Promise.all(
-    uncached.map(c => getWikidataLabel(c.qid, 'sv'))
+    uncached.map(c => getWikidataLabel(c.qid, locale.value))
   )
   results.forEach((label, i) => {
     labels.value[uncached[i].qid] = label

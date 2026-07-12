@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { getDivisions, getWikidataLabel, type DivisionInfo } from '../api'
+
+const { locale } = useI18n()
 
 const props = defineProps<{
   typeQid: string
@@ -31,7 +34,7 @@ onMounted(async () => {
 
 async function fetchLabels() {
   const results = await Promise.all(
-    divisions.value.map(d => getWikidataLabel(d.qid, 'sv'))
+    divisions.value.map(d => getWikidataLabel(d.qid, locale.value))
   )
   results.forEach((label, i) => {
     labels.value[divisions.value[i].qid] = label

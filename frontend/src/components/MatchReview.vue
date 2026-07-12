@@ -6,7 +6,7 @@ import confetti from 'canvas-confetti'
 import { getMatches, confirmMatch, getAuthStatus, rejectMatch, getWikidataLabel, type MatchResponse, type AuthStatus } from '../api'
 import L from 'leaflet'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const props = defineProps<{
   typeQid: string
@@ -34,7 +34,7 @@ let markersLayer: L.LayerGroup | null = null
 
 onMounted(async () => {
   authStatus.value = await getAuthStatus()
-  label.value = await getWikidataLabel(props.qid, 'sv')
+  label.value = await getWikidataLabel(props.qid, locale.value)
   await load()
 })
 
