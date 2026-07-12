@@ -1,6 +1,6 @@
 install:
     cd backend && poetry install
-    cd frontend && npm install
+    cd frontend && npm install --legacy-peer-deps
 
 api:
     cd backend && LOG_LEVEL=DEBUG poetry run uvicorn main:app --reload --port 8000
