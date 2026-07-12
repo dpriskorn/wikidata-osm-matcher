@@ -172,12 +172,13 @@ function getOsmEditUrl(lat: number, lon: number, zoom: number): string {
 }
 
 function getJosmUrl(lat: number, lon: number, label: string): string {
+  const nameTag = label ? `<tag k="name" v="${label}"/>` : ''
   const osmXml = `<?xml version="1.0" encoding="UTF-8"?>
 <osm version="0.6" generator="Wikidata-OSM Matcher">
   <node id="-1" lat="${lat}" lon="${lon}" version="0">
     <tag k="wikidata" v="${props.qid}"/>
     <tag k="leisure" v="bathing_place"/>
-    <tag k="name" v="${label}"/>
+    ${nameTag}
   </node>
 </osm>`
   const encoded = encodeURIComponent(osmXml)
