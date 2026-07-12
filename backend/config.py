@@ -63,6 +63,7 @@ class ObjectTypeConfig(BaseModel):
     wikidata: WikidataConfig
     overpass: OverpassQuery
     matching: MatchingConfig
+    experimental: bool = False
 
 
 @lru_cache

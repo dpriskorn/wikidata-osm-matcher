@@ -51,7 +51,8 @@
   },
   "objectType": {
     "bathingPlace": "Bathing places",
-    "hikingTrail": "Hiking trails"
+    "hikingTrail": "Hiking trails",
+    "experimental": "experimental"
   },
   "divisions": {
     "loading": "Loading...",

@@ -8,6 +8,7 @@ export interface ObjectTypeInfo {
   object_type: string
   label: string
   qid: string
+  experimental?: boolean
 }
 
 export interface CandidateInfo {

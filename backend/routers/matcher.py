@@ -37,6 +37,7 @@ class ObjectTypeInfo(BaseModel):
     object_type: str
     label: str
     qid: str
+    experimental: bool = False
 
 
 class CandidateInfo(BaseModel):
@@ -112,7 +113,7 @@ def get_matcher_type(config, wikidata: WikidataClient, overpass: OverpassClient)
 async def list_object_types():
     configs = get_all_configs()
     return [
-        ObjectTypeInfo(object_type=k, label=v.label, qid=v.qid)
+        ObjectTypeInfo(object_type=k, label=v.label, qid=v.qid, experimental=v.experimental)
         for k, v in configs.items()
     ]
 

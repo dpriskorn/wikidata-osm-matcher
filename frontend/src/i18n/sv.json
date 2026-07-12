@@ -51,7 +51,8 @@
   },
   "objectType": {
     "bathingPlace": "Badplatser",
-    "hikingTrail": "Vandringsleder"
+    "hikingTrail": "Vandringsleder",
+    "experimental": "experimentell"
   },
   "divisions": {
     "loading": "Laddar...",
