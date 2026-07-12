@@ -119,7 +119,7 @@ export async function rejectMatch(
 const USER_AGENT = 'osm-wikidata-matcher-neo 1.0 (https://github.com/anomalyco/opencode)'
 
 export async function getWikidataLabel(qid: string, lang: string = 'en'): Promise<string> {
-  const url = `https://www.wikidata.org/api/rest_v1/entities/items/${qid}/labels/${lang}`
+  const url = `https://www.wikidata.org/w/rest.php/wikibase/v1/entities/items/${qid}/labels/${lang}`
   try {
     const { data } = await axios.get(url, {
       headers: { 'User-Agent': USER_AGENT },
