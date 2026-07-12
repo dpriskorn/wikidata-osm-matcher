@@ -26,7 +26,7 @@
     "refresh": "Refresh",
     "noMatchesFound": "No OSM candidates found.",
     "viewInOSM": "View in OSM ↗",
-    "createInOSM": "Create in OSM ↗",
+    "createInOSM": "Open in ID ↗",
     "josmAddNode": "Add new node using JOSM",
     "osmTypeId": "{type}/{id}",
     "wikidataLinkExists": "✓ Wikidata link exists in OSM",
