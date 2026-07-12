@@ -82,12 +82,15 @@ npm run dev
 2. Restart backend
 3. New type appears in the web interface
 
+## Matching
+
+Matching combines fuzzy name matching, geographic proximity, and Wikidata tag detection.
+
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | Backend | FastAPI, Pydantic, httpx |
 | Frontend | Vue 3, Vite, TypeScript, Pinia |
-| Matching | rapidfuzz (fuzzy string matching) |
-| Wikidata | SPARQL + Wikibase API |
+| Wikidata | SPARQL (Qlever) + EntityData API |
 | OSM | Overpass API |
