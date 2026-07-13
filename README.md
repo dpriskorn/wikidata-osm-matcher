@@ -29,7 +29,6 @@ Matching methods are configured per object type in YAML:
 
 | Type | Method | Description |
 |------|--------|-------------|
-| `hiking_trail` | name | Name-based fuzzy match within country bbox (experimental) |
 | `bathing_place` | bbox | Geographic search within 500m radius from coordinates |
 
 ## Configuration
