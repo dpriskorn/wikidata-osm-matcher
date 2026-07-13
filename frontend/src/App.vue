@@ -21,6 +21,7 @@ const radiusOptions = [
 function setRadius(radius: number) {
   selectedRadius.value = radius
   localStorage.setItem(RADIUS_STORAGE_KEY, String(radius))
+  window.location.reload()
 }
 
 async function fetchTypeLabel() {
