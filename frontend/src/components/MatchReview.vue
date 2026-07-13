@@ -29,6 +29,28 @@ const hasBathingPlaceNode = computed(() => {
     m.osm_type === 'node' && m.tags?.leisure === 'bathing_place'
   ) ?? false
 })
+
+const commonsIdentical = computed(() => {
+  const p373 = data.value?.commons_p373
+  const sitelink = data.value?.commons_sitelink
+  return p373 && sitelink && p373 === sitelink
+})
+
+const commonsP373Url = computed(() => {
+  const p373 = data.value?.commons_p373
+  if (!p373) return null
+  return `https://commons.wikimedia.org/wiki/Category:${encodeURIComponent(p373)}`
+})
+
+const commonsSitelinkUrl = computed(() => {
+  const sitelink = data.value?.commons_sitelink
+  if (!sitelink) return null
+  return `https://commons.wikimedia.org/wiki/${encodeURIComponent(sitelink)}`
+})
+
+const commonsSearchUrl = computed(() => {
+  return `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(label.value)}&title=Special%3AMediaSearch&type=image`
+})
 let map: L.Map | null = null
 let markersLayer: L.LayerGroup | null = null
 
@@ -262,6 +284,22 @@ function filteredTags(tags: Record<string, string>): Record<string, string> {
         <a v-else :href="`https://www.naturkartan.se/sv/search/?query=${encodeURIComponent(label)}`" target="_blank" class="btn btn-outline-secondary btn-sm">
           🌲 Naturkartan
         </a>
+        <template v-if="commonsIdentical && commonsP373Url">
+          <a :href="commonsP373Url" target="_blank" class="btn btn-info">
+            🖼️ Commons
+          </a>
+        </template>
+        <template v-else>
+          <a v-if="data?.commons_p373" :href="commonsP373Url!"" target="_blank" class="btn btn-info">
+            🖼️ Commons
+          </a>
+          <a v-if="data?.commons_sitelink" :href="commonsSitelinkUrl!" target="_blank" class="btn btn-info">
+            🖼️ Commons
+          </a>
+          <a v-if="!data?.commons_p373 && !data?.commons_sitelink" :href="commonsSearchUrl" target="_blank" class="btn btn-outline-secondary btn-sm">
+            🖼️ Commons
+          </a>
+        </template>
         <a :href="`https://www.google.com/search?q=${encodeURIComponent(label)}`" target="_blank" class="btn btn-outline-secondary btn-sm">
           🔍 Google
         </a>

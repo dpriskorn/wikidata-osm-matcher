@@ -48,6 +48,8 @@ class WikidataItem(BaseModel):
     coord: WikidataCoordinates | None = None
     badkartan: str | None = None
     naturkartan: str | None = None
+    commons_p373: str | None = None
+    commons_sitelink: str | None = None
 
 
 class WikidataClient:
@@ -110,6 +112,12 @@ class WikidataClient:
         if 'P10467' in claims:
             naturkartan = claims['P10467'][0]['mainsnak']['datavalue']['value']
 
+        commons_p373 = None
+        if 'P373' in claims:
+            commons_p373 = claims['P373'][0]['mainsnak']['datavalue']['value']
+
+        commons_sitelink = item_data.get('sitelinks', {}).get('commonswiki', {}).get('title')
+
         country = None
         if 'P17' in claims:
             country = claims['P17'][0]['mainsnak']['datavalue']['value']
@@ -126,6 +134,8 @@ class WikidataClient:
             coord=coord,
             badkartan=badkartan,
             naturkartan=naturkartan,
+            commons_p373=commons_p373,
+            commons_sitelink=commons_sitelink,
         )
 
     def update_property(self, qid: str, property_id: str, value: str) -> bool:
@@ -191,6 +201,8 @@ class WikidataClient:
                 coord=coord,
                 badkartan=r.get("badkartan", {}).get("value"),
                 naturkartan=r.get("naturkartan", {}).get("value"),
+                commons_p373=r.get("commons", {}).get("value"),
+                commons_sitelink=r.get("commonsSitelink", {}).get("value"),
             ))
         log.info(f"Parsed {len(items)} Wikidata items from {len(results)} bindings")
         return items

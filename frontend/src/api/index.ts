@@ -21,6 +21,8 @@ export interface CandidateInfo {
   coord: { lat: number; lon: number } | null
   badkartan?: string
   naturkartan?: string
+  commons_p373?: string
+  commons_sitelink?: string
 }
 
 export interface CountryInfo {
@@ -62,6 +64,8 @@ export interface MatchResponse {
   osm_timestamp: string | null
   badkartan?: string
   naturkartan?: string
+  commons_p373?: string
+  commons_sitelink?: string
 }
 
 export async function getObjectTypes(): Promise<ObjectTypeInfo[]> {

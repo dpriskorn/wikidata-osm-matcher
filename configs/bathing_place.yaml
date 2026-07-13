@@ -25,13 +25,17 @@ wikidata:
     sparql_query: |
       PREFIX wd: <http://www.wikidata.org/entity/>
       PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-      SELECT DISTINCT ?item ?coord ?division ?country ?badkartan ?naturkartan ?itemLabel ?divisionLabel ?countryLabel WHERE {
+      SELECT DISTINCT ?item ?coord ?division ?country ?badkartan ?naturkartan ?commons ?commonsSitelink WHERE {
         ?item wdt:P31/wdt:P279* wd:Q567998 .
         ?item wdt:P625 ?coord .
         ?item wdt:P17 ?country .
         ?item wdt:P131 ?division .
         OPTIONAL { ?item wdt:P9615 ?badkartan }
         OPTIONAL { ?item wdt:P10467 ?naturkartan }
+        OPTIONAL { ?item wdt:P373 ?commons }
+        OPTIONAL { ?item schema:about ?s . ?s schema:isPartOf <https://commons.wikimedia.org/> }
+        FILTER (BOUND(?commons) || BOUND(?s))
+        BIND(COALESCE(?commons, ?s) AS ?commonsSitelink)
         MINUS { ?item wdt:P10689 [] } # way
         MINUS { ?item wdt:P402 [] } # rel
         MINUS { ?item wdt:P11693 [] } # node
