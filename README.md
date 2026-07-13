@@ -4,7 +4,7 @@ Web application for matching Wikidata objects to OpenStreetMap with manual valid
 
 ## Overview
 
-The system fetches objects from Wikidata that are missing an OSM link (P402), presents candidates from the Overpass API for matching, and lets the user confirm or reject each match.
+The system fetches objects from Wikidata that are missing OSM links (P402 for relations, P10689 for ways, P11693 for nodes), presents candidates from the Overpass API for matching, and lets the user confirm or reject each match.
 
 ## Architecture
 
