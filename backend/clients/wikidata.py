@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = "osm-wikidata-matcher-neo 1.0 (https://github.com/anomalyco/opencode)"
+USER_AGENT = "osm-wikidata-matcher-neo 1.0 (https://github.com/anomalyco/opencode; User:So9q)"
 
 
 class QleverIntegrator:
